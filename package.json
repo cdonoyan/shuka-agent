@@ -1,0 +1,100 @@
+{
+  "name": "@shukashake/agent",
+  "version": "2.1.2",
+  "description": "Universal Trust Guardian for AI Agents - The united attestation, marketplace, and registry layer for moving protected data in the AI economy",
+  "mcpName": "io.github.cdonoyan/shuka",
+  "main": "index.js",
+  "bin": {
+    "shuka-mcp": "./mcp.js"
+  },
+  "exports": {
+    ".": {
+      "require": "./index.js",
+      "default": "./index.js"
+    },
+    "./client": {
+      "require": "./client.js",
+      "default": "./client.js"
+    },
+    "./sdk": {
+      "require": "./sdk.js",
+      "default": "./sdk.js"
+    },
+    "./mcp": {
+      "require": "./mcp.js",
+      "default": "./mcp.js"
+    }
+  },
+  "scripts": {
+    "build": "node -c index.js && node -c client.js && node -c sdk.js && node -c mcp.js && echo 'Build OK'",
+    "test": "node --test",
+    "mcp": "node mcp.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "shuka",
+    "attestation",
+    "trust",
+    "ai-agents",
+    "agent-to-agent",
+    "handshake",
+    "verification",
+    "proof-token",
+    "compliance",
+    "healthcare",
+    "construction",
+    "roi",
+    "data-portability",
+    "enterprise",
+    "marketplace",
+    "license",
+    "registry",
+    "one-ring",
+    "idempotent",
+    "rules-layer",
+    "mcp",
+    "claude",
+    "openai",
+    "anthropic"
+  ],
+  "author": "Auron <info@auron.co>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdonoyan/shuka-agent.git"
+  },
+  "homepage": "https://shuka.app",
+  "bugs": {
+    "url": "https://github.com/cdonoyan/shuka-agent/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "sdk.js",
+    "mcp.js",
+    "index.d.ts",
+    "client.d.ts",
+    "sdk.d.ts",
+    "mcp.d.ts",
+    "README.md",
+    "CHANGELOG.md",
+    "server.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "optionalDependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "peerDependencies": {
+    "@modelcontextprotocol/sdk": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    }
+  }
+}

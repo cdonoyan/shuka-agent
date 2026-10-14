@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.cdonoyan/shuka",
+  "description": "Universal trust attestation for AI agents: create, verify, and negotiate Shuka trust proofs.",
+  "repository": {
+    "url": "https://github.com/cdonoyan/shuka-agent",
+    "source": "github"
+  },
+  "version": "2.1.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@shukashake/agent",
+      "version": "2.1.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Shuka API base URL",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false,
+          "name": "SHUKA_API_URL"
+        },
+        {
+          "description": "Shuka SDK API key (required for shake creation, terms, and marketplace tools; verification tools work without it)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "SHUKA_API_KEY"
+        }
+      ]
+    }
+  ]
+}
