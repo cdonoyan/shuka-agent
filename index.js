@@ -86,6 +86,8 @@ const {
 // MAIN EXPORTS
 // ===========================================================================
 
+const { createGuard, ShukaGuardError } = require('./guard');
+
 module.exports = {
   // =========================================================================
   // PRIMARY SDK CLASS - Start here
@@ -164,6 +166,8 @@ module.exports = {
    * if (trust.shouldProceed) { ... }
    */
   createShukaMiddleware,
+  createGuard,
+  ShukaGuardError,
 
   /**
    * Create attestation middleware for outbound data.

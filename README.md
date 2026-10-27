@@ -543,7 +543,7 @@ Or configure in Claude Desktop's `claude_desktop_config.json`:
 }
 ```
 
-**Available MCP Tools (13, united):**
+**Available MCP Tools (15, united):**
 
 *One Ring shakes*
 - `create_idempotent_shake` - RECOMMENDED: create (or return existing) shake for any entity - same input, same shake
@@ -567,12 +567,55 @@ Or configure in Claude Desktop's `claude_desktop_config.json`:
 *Rules layer*
 - `manage_terms` - Create/get/update/revoke terms, record access, revisions, receipts
 
+*The drawbridge (v2.2.0)*
+- `check_access` - THE decision point: signed allow/deny over the stored terms + revocation state; allowed crossings receipted + ledgered
+- `revoke_grant` - Issuer/admin grant revocation with the transactional GRANT_REVOKED ledger event
+
 *Registry*
 - `registry` - Ledger history, registry discovery, can-issue/will-accept, interop checks
 
 **Available MCP Resources:**
 - `attestation://{proof_token}` - Look up attestation details
 - `grant://{grant_id}` - Public grant verification
+
+
+### shuka.guard — the enforcement point (NEW)
+
+The drawbridge, installed in front of YOUR data API. On every crossing the
+guard asks Shuka's decision point whether this accessor may use this data
+for this purpose right now — terms, validity window, remaining uses, purpose
+binding, and revocation state. Denials stop the request; allowed crossings
+are receipted on the hash-chained ledger.
+
+```javascript
+const { createGuard } = require('@shukashake/agent/guard');
+
+const guard = createGuard({ apiKey: process.env.SHUKA_CROSSING_PASS });
+
+// Express: protect any data route
+app.get('/patients/:id/records',
+  guard.express(),   // 403 unless Shuka says allow; req.shuka = signed verdict
+  (req, res) => res.json(loadRecords(req.params.id)));
+
+// Framework-agnostic
+const verdict = await guard.checkAccess({
+  proofToken: 'shk_v1....', purpose: 'care_coordination' });
+```
+
+Fail-closed by default: if Shuka is unreachable the bridge stays up.
+
+### Crossing-passes — agents never hold the partner key (NEW)
+
+Exchange your partner key for a short-lived, scope-limited pass per agent run:
+
+```
+POST /api/sdk/v1/keys/exchange
+{ "expires_in_seconds": 900, "permissions": ["handshake:verify"], "name": "agent-7" }
+```
+
+The pass is sent as `X-SDK-API-Key`, self-destructs at expiry (60s–1h), can
+never create keys or exchange for further passes, and can never hold scopes
+its parent lacks. Keep the partner key in your vault/CI.
 
 ## Caching
 

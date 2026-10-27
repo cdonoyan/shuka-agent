@@ -139,6 +139,17 @@ export declare class ShukaClientError extends Error {
   code: string;
   details: ShukaClientErrorDetails;
   constructor(message: string, code: string, details?: ShukaClientErrorDetails);
+
+  // The drawbridge (v2.2.0)
+  accessCheck(params?: {
+    termsId?: string; handshakeId?: string; proofToken?: string;
+    purpose?: string; accessorId?: string; record?: boolean;
+  }): Promise<any>;
+  exchangeCrossingPass(options?: {
+    expiresInSeconds?: number; permissions?: string[]; name?: string;
+  }): Promise<any>;
+  revokeGrant(grantId: string, reason?: string): Promise<any>;
+  revokeShake(shakeId: string, reason?: string): Promise<any>;
 }
 
 /** Client configuration options */

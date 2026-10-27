@@ -1496,6 +1496,85 @@ class ShukaClient {
   invalidate(proofToken) {
     this.verifyCache.delete(proofToken);
   }
+
+  // ==========================================================================
+  // THE DRAWBRIDGE (v2.2.0): decision point, crossing-passes, grant revocation
+  // ==========================================================================
+
+  /**
+   * Ask the decision point: may this accessor use this data for this purpose
+   * right now? Evaluates the stored Terms Layer + the shake's revocation
+   * state server-side and returns a SIGNED verdict. Allowed crossings are
+   * receipted and ledgered (ACCESSED).
+   *
+   * POST /api/sdk/v1/access/check
+   *
+   * @param {Object} params - { termsId | handshakeId | proofToken, purpose,
+   *                            accessorId, record (default true) }
+   * @returns {Promise<Object>} { allowed, decision, reason, verdict, receipt_id }
+   */
+  async accessCheck(params = {}) {
+    const body = { purpose: params.purpose || 'unspecified',
+                   record: params.record !== false };
+    if (params.termsId) body.terms_id = params.termsId;
+    else if (params.handshakeId) body.handshake_id = params.handshakeId;
+    else if (params.proofToken) body.proof_token = params.proofToken;
+    if (params.accessorId || this.agentId) {
+      body.accessor_id = params.accessorId || this.agentId;
+    }
+    return this.request('/sdk/v1/access/check', 'POST', body);
+  }
+
+  /**
+   * Exchange this client's key for a short-lived, scope-limited
+   * CROSSING-PASS (60s-1h). Hand the pass to the agent; keep the partner
+   * key in the vault. Passes cannot create keys or exchange again.
+   *
+   * POST /api/sdk/v1/keys/exchange
+   *
+   * @param {Object} [options] - { expiresInSeconds, permissions, name }
+   * @returns {Promise<Object>} { crossing_pass, key_id, expires_at, ... }
+   */
+  async exchangeCrossingPass(options = {}) {
+    return this.request('/sdk/v1/keys/exchange', 'POST', {
+      expires_in_seconds: options.expiresInSeconds || 900,
+      permissions: options.permissions,
+      name: options.name,
+    });
+  }
+
+  /**
+   * Revoke a shake — the consent-withdrawal lever. Status flips to revoked,
+   * the transactional CONSENT_REVOKED ledger event is written, terms and
+   * compact proofs cascade, and every subsequent access check denies with
+   * reason 'consent_revoked'.
+   *
+   * POST /api/sdk/v1/shake/{shakeId}/revoke
+   *
+   * @param {string} shakeId - The handshake/shake ID
+   * @param {string} [reason] - Revocation reason (audit trail)
+   * @returns {Promise<Object>} Revocation result
+   */
+  async revokeShake(shakeId, reason) {
+    return this.request(`/sdk/v1/shake/${encodeURIComponent(shakeId)}/revoke`,
+                        'POST', reason ? { reason } : {});
+  }
+
+  /**
+   * Revoke a license grant (issuer or admin only). Writes the
+   * transactional GRANT_REVOKED ledger event; the grant's proof stops
+   * verifying immediately.
+   *
+   * POST /api/sdk/v1/grants/{grantId}/revoke
+   *
+   * @param {string} grantId - The grant ID
+   * @param {string} [reason] - Revocation reason
+   * @returns {Promise<Object>} Revocation result
+   */
+  async revokeGrant(grantId, reason) {
+    return this.request(`/sdk/v1/grants/${encodeURIComponent(grantId)}/revoke`,
+                        'POST', { reason });
+  }
 }
 
 // ===========================================================================

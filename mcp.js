@@ -566,7 +566,48 @@ and to confirm two parties can exchange a given shake type BEFORE attempting it.
       },
       required: ['action'],
     },
+  },,
+
+  // ===========================================================================
+  // THE DRAWBRIDGE (v2.2.0)
+  // ===========================================================================
+  {
+    name: 'check_access',
+    description: `THE DECISION POINT: may this accessor use this data for this purpose right now?
+
+Evaluates the stored Terms Layer (status, validity window, remaining uses,
+purpose binding) AND the shake's revocation state, server-side. Returns a
+SIGNED verdict. Allowed crossings are receipted and land as ACCESSED events
+on the hash-chained ledger; a revoked shake denies with consent_revoked.
+
+Call this BEFORE acting on data protected by a Shuka proof — it is the same
+check shuka.guard performs at enterprise enforcement points.`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        proof_token: { type: 'string', description: 'Compact proof token (shk_v1....) — or use terms_id / handshake_id' },
+        terms_id: { type: 'string', description: 'Terms ID (alternative to proof_token)' },
+        handshake_id: { type: 'string', description: 'Handshake ID (alternative to proof_token)' },
+        purpose: { type: 'string', description: "Declared purpose of access (e.g. 'care_coordination')" },
+        record: { type: 'boolean', description: 'Record a receipt + ledger event on allow (default true)' },
+      },
+    },
   },
+  {
+    name: 'revoke_grant',
+    description: `Revoke a license grant (issuer or admin only).
+
+Writes the transactional GRANT_REVOKED event on the grant's ledger chain and
+revokes the grant's proof token — verify_grant reports it immediately.`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        grant_id: { type: 'string', description: 'The grant ID to revoke' },
+        reason: { type: 'string', description: 'Revocation reason (audit trail)' },
+      },
+      required: ['grant_id'],
+    },
+  }
 ];
 
 /**
@@ -842,6 +883,20 @@ async function handleToolCall(name, args) {
           default:
             return toolError(new Error(`Unknown registry action: ${action}`));
         }
+      }
+
+      case 'check_access': {
+        return toolResult(await client.accessCheck({
+          proofToken: args.proof_token,
+          termsId: args.terms_id,
+          handshakeId: args.handshake_id,
+          purpose: args.purpose,
+          record: args.record,
+        }));
+      }
+
+      case 'revoke_grant': {
+        return toolResult(await client.revokeGrant(args.grant_id, args.reason));
       }
 
       default:

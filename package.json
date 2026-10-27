@@ -1,6 +1,6 @@
 {
   "name": "@shukashake/agent",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "Universal Trust Guardian for AI Agents - The united attestation, marketplace, and registry layer for moving protected data in the AI economy",
   "mcpName": "io.github.cdonoyan/shuka",
   "main": "index.js",
@@ -23,6 +23,10 @@
     "./mcp": {
       "require": "./mcp.js",
       "default": "./mcp.js"
+    },
+    "./guard": {
+      "require": "./guard.js",
+      "default": "./guard.js"
     }
   },
   "scripts": {
@@ -75,10 +79,12 @@
     "client.js",
     "sdk.js",
     "mcp.js",
+    "guard.js",
     "index.d.ts",
     "client.d.ts",
     "sdk.d.ts",
     "mcp.d.ts",
+    "guard.d.ts",
     "README.md",
     "CHANGELOG.md",
     "server.json"

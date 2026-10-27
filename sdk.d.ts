@@ -46,6 +46,17 @@ export declare class ShukaSDKError extends Error {
   code: string;
   details: ShukaSDKErrorDetails;
   constructor(message: string, code: string, details?: ShukaSDKErrorDetails);
+
+  // The drawbridge (v2.2.0)
+  accessCheck(params?: {
+    termsId?: string; handshakeId?: string; proofToken?: string;
+    purpose?: string; accessorId?: string; record?: boolean;
+  }): Promise<any>;
+  exchangeCrossingPass(options?: {
+    expiresInSeconds?: number; permissions?: string[]; name?: string;
+  }): Promise<any>;
+  revokeGrant(grantId: string, reason?: string): Promise<any>;
+  revokeShake(shakeId: string, reason?: string): Promise<any>;
 }
 
 /** SDK configuration options */

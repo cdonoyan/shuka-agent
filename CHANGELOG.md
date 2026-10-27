@@ -1,5 +1,34 @@
 # Changelog
 
+## 2.2.0 (2026-10-26) — The Drawbridge
+
+**New: `@shukashake/agent/guard` — shuka.guard, the enforcement point.**
+Express middleware + framework-agnostic `checkAccess()` that enterprises
+install in front of THEIR OWN data APIs. Every crossing asks Shuka's decision
+point; denials stop the request; allowed crossings are receipted on the
+hash-chained ledger. Fail-closed by default.
+
+**New SDK/client methods:**
+- `accessCheck({ termsId | handshakeId | proofToken, purpose, record })` —
+  POST /api/sdk/v1/access/check: signed allow/deny verdict over the stored
+  Terms Layer + the shake's revocation state.
+- `exchangeCrossingPass({ expiresInSeconds, permissions, name })` —
+  POST /api/sdk/v1/keys/exchange: short-lived (60s–1h) scope-subset keys so
+  agents never hold the partner key. Passes cannot create keys or re-exchange.
+- `revokeGrant(grantId, reason)` — POST /api/sdk/v1/grants/{id}/revoke
+  (issuer/admin): transactional GRANT_REVOKED ledger event; verifyGrant
+  reports revocation immediately.
+
+**New MCP tools (15 total):** `check_access`, `revoke_grant`.
+
+**Server-side (same release train):** webhooks now actually deliver (signed
+POST, X-Shuka-Signature) including `shake.revoked` / `grant.revoked`
+revocation push; one unified trust engine (verified TruAnon identity now
+raises your trust score); wrong keys return 401 everywhere (the 402-masks-401
+defect is gone); key-management routes moved to /api/sdk/v1/keys* (legacy
+/registry/keys* paths remain as aliases).
+
+
 ## 2.1.2 (2026-10-14)
 
 Metadata-only release — no code changes. Makes the MCP server publicly

@@ -614,6 +614,58 @@ class ShukaSDK {
   }
 
   // =========================================================================
+  // THE DRAWBRIDGE (v2.2.0)
+  // =========================================================================
+
+  /**
+   * The decision point: may this accessor use this data for this purpose
+   * right now? Returns a signed allow/deny verdict; allowed crossings are
+   * receipted on the hash-chained ledger. This is what shuka.guard calls
+   * on every crossing — use it directly for custom enforcement points.
+   *
+   * @param {Object} params - { termsId | handshakeId | proofToken, purpose, accessorId, record }
+   * @returns {Promise<Object>} { allowed, decision, reason, verdict, receipt_id }
+   */
+  async accessCheck(params = {}) {
+    return this.client.accessCheck(params);
+  }
+
+  /**
+   * Exchange this key for a short-lived, scope-limited crossing-pass.
+   * Agents hold passes, never the partner key.
+   *
+   * @param {Object} [options] - { expiresInSeconds (60-3600), permissions, name }
+   * @returns {Promise<Object>} { crossing_pass, key_id, expires_at }
+   */
+  async exchangeCrossingPass(options = {}) {
+    return this.client.exchangeCrossingPass(options);
+  }
+
+  /**
+   * Revoke a shake — the owner's consent-withdrawal lever. Every
+   * subsequent accessCheck denies with reason 'consent_revoked'.
+   *
+   * @param {string} shakeId - The handshake/shake ID
+   * @param {string} [reason] - Revocation reason
+   * @returns {Promise<Object>} Revocation result
+   */
+  async revokeShake(shakeId, reason) {
+    return this.client.revokeShake(shakeId, reason);
+  }
+
+  /**
+   * Revoke a license grant (issuer/admin). GRANT_REVOKED lands on the
+   * ledger transactionally; verifyGrant() reports it immediately.
+   *
+   * @param {string} grantId - The grant ID
+   * @param {string} [reason] - Revocation reason
+   * @returns {Promise<Object>} Revocation result
+   */
+  async revokeGrant(grantId, reason) {
+    return this.client.revokeGrant(grantId, reason);
+  }
+
+  // =========================================================================
   // REGISTRY DISCOVERY AND INTEROPERABILITY
   // =========================================================================
 
